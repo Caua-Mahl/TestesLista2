@@ -20,51 +20,60 @@ class CalculadoraFinanceira
 
     public function calcularJurosSimples(): string
     {
-        return 'R$ ' .number_format($this->capital * $this->taxa * $this->tempo, 2, ',','.');
+        return 'R$ ' . number_format($this->capital * $this->taxa * $this->tempo, 2, ',', '.');
     }
 
     public function calcularJurosCompostos(): string
     {
-        return 'R$ ' .number_format($this->capital * (1 + $this->taxa) ** $this->tempo, 2, ',', '.');
+        return 'R$ ' . number_format($this->capital * (1 + $this->taxa) ** $this->tempo, 2, ',', '.');
     }
 
-    public function calcularAmortizacao(string $tipo):array
+    public function calcularAmortizacao(string $tipo): array
     {
-        try 
-        {
+        try {
             $tipo = strtoupper($tipo);
-            
-            if ($tipo != "SAC" && $tipo != "PRICE")
-            {
+
+            if ($tipo != "SAC" && $tipo != "PRICE") {
                 throw new Exception("Tipo inválido, escolha entre 'SAC' ou 'PRICE' ");
             }
 
-            if ($tipo == "SAC")
-            {
-                $amortizacao = number_format($this->capital / $this->tempo, 2, ',','.');
-                $juros       = number_format($this->capital * $this->taxa * 0.1, 2,',','.');
+            if ($tipo == "SAC") {
+                $amortizacao = number_format($this->capital / $this->tempo, 2, ',', '.');
+                $juros       = array();
+                $resultado   = array();
 
-                return array("Amortização" => 'R$ ' . $amortizacao, 
-                             "Juros"       => 'R$ ' . $juros);
+                for ($i = 0; $i < $this->tempo; $i++) 
+                {
+                    $juros[$i]     = number_format($this->capital * $this->taxa - $this->capital / $this->tempo * $i * ($this->taxa) , 2, ',', '.');
+                    $resultado[$i] = array( "Amortização" => 'R$ ' . $amortizacao,
+                                            "Juros"       => 'R$ ' . $juros[$i]);
+                }     
+
+                return $resultado;
             }
 
-            if ($tipo == "PRICE")
-            {
+            if ($tipo == "PRICE") {
                 // sei que é errado alocar memória novamente, mas para melhorar a leitura do código e facilitar o meu entendimento deixei assim.
                 $tx          = $this->taxa;
                 $tp          = $this->tempo;
                 $ca          = $this->capital;
-                $juros       = $ca * $tx;
-                $prestacao   = $ca * ($tx / (1 - (1 + $tx) ** -$tp));
-                $amortizacao = $prestacao - $juros;
+                $prestação   = $ca * ($tx * (1 + $tx) ** $tp) / ((1 + $tx) ** $tp - 1);
+                $amortizacao = array();
+                $juros       = array();
+                $resultado   = array();
+
+                for ($i = 0; $i < $this->tempo; $i++) 
+                {
+
+                    $juros[$i]       = number_format($this->capital * $this->taxa - $this->capital / $this->tempo * $i * ($this->taxa) , 2, ',', '.');
+
+                    $resultado[$i]   = array( "Amortização" => 'R$ ' . $amortizacao[$i],
+                                              "Juros"       => 'R$ ' . $juros[$i]);
+                }     
 
 
-                return array(
-                             "Amortização" => 'R$ ' . number_format($amortizacao, 2, ',','.'), 
-                             "Juros"       => 'R$ ' . number_format($juros * 0.1, 2, ',','.')
-                            );
+                return $resultado;
             }
-
         } 
         catch (Exception $e) 
         {
