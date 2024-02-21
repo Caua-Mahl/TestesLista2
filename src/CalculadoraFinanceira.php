@@ -14,18 +14,18 @@ class CalculadoraFinanceira
     public function __construct(float $capital, float $taxa, int $tempo)
     {
         $this->capital = $capital;
-        $this->taxa    = $taxa;
+        $this->taxa    = $taxa * 0.01;
         $this->tempo   = $tempo;
     }
 
-    public function calcularJurosSimples(): float
+    public function calcularJurosSimples(): string
     {
-        return $this->capital * $this->taxa * $this->tempo;
+        return 'R$ ' .number_format($this->capital * $this->taxa * $this->tempo, 2, ',','.');
     }
 
-    public function calcularJurosCompostos(): float
+    public function calcularJurosCompostos(): string
     {
-        return $this->capital * (1 + $this->taxa) ** $this->tempo;
+        return 'R$ ' .number_format($this->capital * (1 + $this->taxa) ** $this->tempo, 2, ',', '.');
     }
 
     public function calcularAmortizacao(string $tipo):array
@@ -41,10 +41,11 @@ class CalculadoraFinanceira
 
             if ($tipo == "SAC")
             {
-                $amortizacao = $this->capital / $this->tempo;
-                $juros       = $this->capital * $this->taxa * 0.1;
+                $amortizacao = number_format($this->capital / $this->tempo, 2, ',','.');
+                $juros       = number_format($this->capital * $this->taxa * 0.1, 2,',','.');
 
-                return array("Amortização" => $amortizacao, "Juros" => $juros);
+                return array("Amortização" => 'R$ ' . $amortizacao, 
+                             "Juros"       => 'R$ ' . $juros);
             }
 
             if ($tipo == "PRICE")
@@ -58,7 +59,10 @@ class CalculadoraFinanceira
                 $amortizacao = $prestacao - $juros;
 
 
-                return array("Amortização" => $amortizacao, "Juros" => $juros * 0.1);
+                return array(
+                             "Amortização" => 'R$ ' . number_format($amortizacao, 2, ',','.'), 
+                             "Juros"       => 'R$ ' . number_format($juros * 0.1, 2, ',','.')
+                            );
             }
 
         } 
