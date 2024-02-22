@@ -100,16 +100,30 @@ class CalculadoraFinanceiraTest extends TestCase
     public function testCalcularAmortizacaoSAC()
     {
         $calculadora  = new CalculadoraFinanceira();
-        $esperado     =[['Parcela' => 1, 'Valor' => 'R$ 5.175,00',  'Amortização' => 'R$ 5.000,00',  'Juros' => 'R$ 175,00', 'Devedor' => 'R$ 20.000,00'],
-                        ['Parcela' => 2, 'Valor' => 'R$ 5.140,00',  'Amortização' => 'R$ 5.000,00',  'Juros' => 'R$ 140,00', 'Devedor' => 'R$ 15.000,00'],
-                        ['Parcela' => 3, 'Valor' => 'R$ 5.105,00',  'Amortização' => 'R$ 5.000,00',  'Juros' => 'R$ 105,00', 'Devedor' => 'R$ 10.000,00'],
-                        ['Parcela' => 4, 'Valor' => 'R$ 5.070,00',  'Amortização' => 'R$ 5.000,00',  'Juros' => 'R$ 70,00',  'Devedor' => 'R$ 5.000,00'],
-                        ['Parcela' => 5, 'Valor' => 'R$ 5.035,00',  'Amortização' => 'R$ 5.000,00',  'Juros' => 'R$ 35,00',  'Devedor' => 'R$ 0,00'],
-                         'Total'   =>   ['Valor' => 'R$ 25.525,00', 'Amortização' => 'R$ 25.000,00', 'Juros' => 'R$ 525,00']];
+        $esperado     = [
+            ['Parcela' => 1, 'Valor' => 'R$ 5.175,00',  'Amortização' => 'R$ 5.000,00',  'Juros' => 'R$ 175,00', 'Devedor' => 'R$ 20.000,00'],
+            ['Parcela' => 2, 'Valor' => 'R$ 5.140,00',  'Amortização' => 'R$ 5.000,00',  'Juros' => 'R$ 140,00', 'Devedor' => 'R$ 15.000,00'],
+            ['Parcela' => 3, 'Valor' => 'R$ 5.105,00',  'Amortização' => 'R$ 5.000,00',  'Juros' => 'R$ 105,00', 'Devedor' => 'R$ 10.000,00'],
+            ['Parcela' => 4, 'Valor' => 'R$ 5.070,00',  'Amortização' => 'R$ 5.000,00',  'Juros' => 'R$ 70,00',  'Devedor' => 'R$ 5.000,00'],
+            ['Parcela' => 5, 'Valor' => 'R$ 5.035,00',  'Amortização' => 'R$ 5.000,00',  'Juros' => 'R$ 35,00',  'Devedor' => 'R$ 0,00'],
+            'Total'   =>   ['Valor' => 'R$ 25.525,00', 'Amortização' => 'R$ 25.000,00', 'Juros' => 'R$ 525,00']
+        ];
+
+        $esperado2    = [
+            ['Parcela' => 1, 'Valor' => 'R$ 33.083.333,33',  'Amortização' => 'R$ 8.333.333,33',  'Juros' => 'R$ 24.750.000,00', 'Devedor' => 'R$ 16.666.666,67'],
+            ['Parcela' => 2, 'Valor' => 'R$ 24.833.333,33',  'Amortização' => 'R$ 8.333.333,33',  'Juros' => 'R$ 16.500.000,00', 'Devedor' => 'R$ 8.333.333,33'],
+            ['Parcela' => 3, 'Valor' => 'R$ 16.583.333,33',  'Amortização' => 'R$ 8.333.333,33',  'Juros' => 'R$ 8.250.000,00', 'Devedor' => 'R$ 0,00'],
+            'Total'   =>   ['Valor' => 'R$ 74.500.000,00', 'Amortização' => 'R$ 25.000.000,00', 'Juros' => 'R$ 49.500.000,00']
+        ];
+
+        $esperado3   =  []
 
         $resultado     = $calculadora->calcularAmortizacao(25000.00, 0.7, 5, "SAC");
+        $resultado2    = $calculadora->calcularAmortizacao(25000000.00, 99, 3, "SAC");
+        $resultado3    = $calculadora->calcularAmortizacao(1, 1, 1, "SAC");
 
-        assertEquals($esperado, $resultado, "erro no SAC 1");
+        assertEquals($esperado, $resultado, "erro no SAC");
+        assertEquals($esperado2, $resultado2, "erro no SAC com valores altos");
     }
 
     public function testCalcularAmortizacaoComValoresNegativos()
