@@ -6,45 +6,49 @@ use Exception;
 
 class CalculadoraFinanceira
 {
-
-    private float $capital;
-    private float $taxa;
-    private int   $tempo;
-
-    public function __construct(float $capital, float $taxa, int $tempo)
+    public function calcularJurosSimples($capital, $taxa, $tempo): string
     {
-        $this->capital = $capital;
-        $this->taxa    = $taxa * 0.01;
-        $this->tempo   = $tempo;
+        try 
+        {
+            $this->validar($capital, $taxa, $tempo);
+
+            return 'R$ ' . number_format(($capital * $taxa * 0.01 * $tempo), 2, ',', '.');
+        } 
+        catch (Exception $e) 
+        {
+            return $e->getMessage();
+        }
     }
 
-    public function calcularJurosSimples(): string
+    public function calcularJurosCompostos($capital, $taxa, $tempo): string
     {
-        return 'R$ ' . number_format($this->capital * $this->taxa * $this->tempo, 2, ',', '.');
+        try 
+        {
+            $this->validar($capital, $taxa, $tempo);
+
+            return 'R$ ' . number_format($capital * (1 + $taxa * 0.01) ** $tempo, 2, ',', '.');
+        } 
+        catch (Exception $e) 
+        {
+            return $e->getMessage();
+        }
     }
 
-    public function calcularJurosCompostos(): string
+    public function calcularAmortizacao($capital, $taxa, $tempo, $tipo): array | string
     {
-        return 'R$ ' . number_format($this->capital * (1 + $this->taxa) ** $this->tempo, 2, ',', '.');
-    }
-
-    public function calcularAmortizacao(string $tipo): array
-    {
-        try {
-            $tipo = strtoupper($tipo);
-
-            if ($tipo != "SAC" && $tipo != "PRICE") {
-                throw new Exception("Tipo inválido, escolha entre 'SAC' ou 'PRICE' ");
-            }
+        try 
+        {
+            $this->validar($capital, $taxa, $tempo, $tipo);
 
             if ($tipo == "SAC") {
-                $amortizacao = number_format($this->capital / $this->tempo, 2, ',', '.');
+                $amortizacao = number_format($capital / $tempo, 2, ',', '.');
                 $juros       = array();
                 $resultado   = array();
+                $taxa        = $taxa * 0.01;
 
-                for ($i = 0; $i < $this->tempo; $i++) 
+                for ($i = 0; $i < $tempo; $i++) 
                 {
-                    $juros[$i]     = number_format($this->capital * $this->taxa - $this->capital / $this->tempo * $i * ($this->taxa) , 2, ',', '.');
+                    $juros[$i]     = number_format($capital * $taxa - $capital / $tempo * $i * ($taxa) , 2, ',', '.');
                     $resultado[$i] = array( "Amortização" => 'R$ ' . $amortizacao,
                                             "Juros"       => 'R$ ' . $juros[$i]);
                 }     
@@ -52,23 +56,21 @@ class CalculadoraFinanceira
                 return $resultado;
             }
 
-            if ($tipo == "PRICE") {
-                // sei que é errado alocar memória novamente, mas para melhorar a leitura do código e facilitar o meu entendimento deixei assim.
-                $tx          = $this->taxa;
-                $tp          = $this->tempo;
-                $ca          = $this->capital;
-                $prestação   = $ca * ($tx * (1 + $tx) ** $tp) / ((1 + $tx) ** $tp - 1);
+            if ($tipo == "PRICE") 
+            {
+                $taxa        = $taxa * 0.01;
+                $prestacao   = $capital * $taxa / (1 - (1 + $taxa) ** -$tempo);
                 $amortizacao = array();
                 $juros       = array();
                 $resultado   = array();
 
-                for ($i = 0; $i < $this->tempo; $i++) 
+                for ($i = 0; $i < $tempo; $i++) 
                 {
+                    $juros[$i]       = $capital * $taxa - $prestacao;
+                    $amortizacao[$i] = $prestacao - $juros[$i];
 
-                    $juros[$i]       = number_format($this->capital * $this->taxa - $this->capital / $this->tempo * $i * ($this->taxa) , 2, ',', '.');
-
-                    $resultado[$i]   = array( "Amortização" => 'R$ ' . $amortizacao[$i],
-                                              "Juros"       => 'R$ ' . $juros[$i]);
+                    $resultado[$i]   = array( "Amortização" => 'R$ ' . number_format($amortizacao[$i], 2, ',', '.'),
+                                              "Juros"       => 'R$ ' . number_format($juros[$i], 2, ',', '.'));
                 }     
 
 
@@ -77,7 +79,36 @@ class CalculadoraFinanceira
         } 
         catch (Exception $e) 
         {
-            echo $e->getMessage();
+            return $e->getMessage();
         }
+    }
+
+    private function validar($capital, $taxa, $tempo, $tipo = "SAC")
+    {
+        if ($capital < 0) 
+        {
+            throw new Exception("O capital deve ser positivo");
+        }
+
+        if ($taxa < 0) 
+        {
+            throw new Exception("A taxa deve ser positiva");
+        }
+
+        if ($tempo < 0) 
+        {
+            throw new Exception("O tempo deve ser positivo");
+        }
+
+        if (!is_numeric($capital) || !is_numeric($taxa) || !is_numeric($tempo) || !is_string($tipo))
+        {
+            throw new Exception("Argumento(s) invalido(s)");
+        }
+
+        if ($tipo != "SAC" && $tipo != "PRICE") 
+        {
+            throw new Exception("Tipo inválido, escolha entre 'SAC' ou 'PRICE'");
+        }
+
     }
 }
