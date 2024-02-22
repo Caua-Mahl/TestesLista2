@@ -40,11 +40,13 @@ class CalculadoraFinanceira
         {
             $this->validar($capital, $taxa, $tempo, $tipo);
 
-            if ($tipo == "SAC") {
+            $juros     = array();
+            $resultado = array();
+            $taxa      = $taxa * 0.01;
+
+            if ($tipo == "SAC") 
+            {
                 $amortizacao = number_format($capital / $tempo, 2, ',', '.');
-                $juros       = array();
-                $resultado   = array();
-                $taxa        = $taxa * 0.01;
 
                 for ($i = 0; $i < $tempo; $i++) 
                 {
@@ -52,17 +54,13 @@ class CalculadoraFinanceira
                     $resultado[$i] = array( "Amortização" => 'R$ ' . $amortizacao,
                                             "Juros"       => 'R$ ' . $juros[$i]);
                 }     
-
                 return $resultado;
             }
 
             if ($tipo == "PRICE") 
             {
-                $taxa        = $taxa * 0.01;
                 $prestacao   = $capital * $taxa / (1 - (1 + $taxa) ** -$tempo);
                 $amortizacao = array();
-                $juros       = array();
-                $resultado   = array();
 
                 for ($i = 0; $i < $tempo; $i++) 
                 {
@@ -72,8 +70,6 @@ class CalculadoraFinanceira
                     $resultado[$i]   = array( "Amortização" => 'R$ ' . number_format($amortizacao[$i], 2, ',', '.'),
                                               "Juros"       => 'R$ ' . number_format($juros[$i], 2, ',', '.'));
                 }     
-
-
                 return $resultado;
             }
         } 
