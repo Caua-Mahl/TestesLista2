@@ -58,7 +58,7 @@ class CalculadoraFinanceiraTest extends TestCase
 
     public function testCalcularJurosCompostosComValoresNegativos()
     {
-        $calculadora = new CalculadoraFinanceira();
+        $calculadora  = new CalculadoraFinanceira();
         $esperado1    = 'O capital deve ser positivo';
         $esperado2    = 'A taxa deve ser positiva';
         $esperado3    = 'O tempo deve ser positivo';
